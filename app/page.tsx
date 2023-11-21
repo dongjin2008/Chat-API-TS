@@ -1,24 +1,35 @@
 'use client'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
+import axios from 'axios'
+
+interface User {
+  id: number;
+  username: string;
+}
 
 export default function Home() {
-  const [users, setUsers] = useState([])
+  const [username, setUsername] = useState<string>('');
 
-  useEffect(() => {
-    fetch('/api/users/users')
-      .then((response) => response.json())
-      .then((data) => setUsers(data))
-  }, []);
+  const handleSubmit = async (username: string) => {
+    try {
+      const response = await axios.post('/api/users', { username });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <main>
-      <h1>Users</h1>
-      <ul>
-        {users.map((user: {name: string}) => (
-          <li key={user.name}>{user.name}</li>
-        ))}
-      </ul>
+      <div>
+        <input type="text" value={username} onChange={(e) => {setUsername(e.target.value)}} onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSubmit(e.currentTarget.value);
+            setUsername('');
+          }
+        }}/>
+      </div>
     </main>
   )
 }
