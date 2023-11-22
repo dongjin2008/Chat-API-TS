@@ -1,21 +1,29 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
+import { useSnapshot } from 'valtio'
+import globalState from '../store/store'
 import { cookies } from 'next/headers'
 
-
 export default function Home() {
-  const cookie_username = cookies().get('username');
-  const [username, setUsername] = useState(cookie_username || '');
+  const [username, setUsername] = useState('');
   const router = useRouter();
+
+  useEffect(() => {
+    const saved_username = localStorage.getItem('username');
+    setUsername(saved_username || '');
+  } ,[]) 
 
   const handleSubmit = async (username: string) => {
     try {
       const response = await axios.post('/api/users', { username });
       console.log(response);
-      cookies().set('userId', response.data.id)
-      cookies().set('username', response.data.username)
+      try {
+        localStorage.setItem('username', username);
+      } catch (error) {
+        console.error(error);
+      }
       router.push('/chat')
     } catch (error) {
       console.error(error);
