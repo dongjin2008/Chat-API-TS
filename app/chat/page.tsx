@@ -55,7 +55,7 @@ export default function Chat() {
         <div className="w-[40.5rem] h-[50rem]">
           {data && data.map((message: Message) => {
             return (
-              <div className="flex justify-start items-center gap-[1rem]">
+              <div key={message.id} className="flex justify-start items-center gap-[1rem]">
                 <div key={message.id} className="w-[4rem] h-[4rem] rounded-[50%] bg-[#C4C4C4] flex justify-center items-center">{message.username[0]}</div>
                 <div className="flex flex-col justify-center items-start gap-[0.5rem]">
                   <p key={message.id} className="text-[#000000] text-[2rem]">{message.message}</p>

@@ -1,10 +1,7 @@
 'use client'
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import { useSnapshot } from 'valtio'
-import globalState from '../store/store'
-import { cookies } from 'next/headers'
 
 export default function Home() {
   const [username, setUsername] = useState('');
