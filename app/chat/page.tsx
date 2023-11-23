@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Server } from "http";
+import Pusher from "pusher-js";
 
 interface Message {
   id: number;
@@ -11,6 +13,15 @@ interface Message {
 export default function Chat() {
   const [data, setData] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
+
+  const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
+    cluster: "eu",
+  })
+
+  const channel = pusher.subscribe("messages");
+  channel.bind("inserted", (newMessage: Message) => {
+    setData([...data, newMessage]);
+  });
 
   const handleSubmit = async (message: string) => {
     try {
@@ -33,7 +44,6 @@ export default function Chat() {
     };
 
   useEffect(() => {
-    
     getMessages();
 
   }, []);

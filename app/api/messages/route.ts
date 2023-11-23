@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../lib/prisma";
-import { io } from "socket.io-client";
 
 export async function GET() {
   const messages = await prisma.message.findMany();
@@ -11,7 +10,17 @@ export async function GET() {
 export async function POST(request: Request) {
   const body = await request.json();
   const new_message = await prisma.message.create({ data: body });
-  io().emit("new_message", new_message);
+
+  const Pusher = require("pusher");
+
+  const pusher = new Pusher({
+    appId: process.env.PUSHER_APP_ID,
+    key: process.env.NEXT_PUBLIC_PUSHER_KEY,
+    secret: process.env.PUSHER_SECRET,
+    cluster: 'eu',
+    useTLS: true,
+  });
+  pusher.trigger("messages", "inserted", new_message);
   return NextResponse.json(new_message);
 }
 
