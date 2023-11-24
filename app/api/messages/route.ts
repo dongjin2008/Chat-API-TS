@@ -34,9 +34,6 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const { id } = await request.json();
-  const message = await prisma.message.delete({
-    where: { id },
-  });
-  return NextResponse.json(message);
+  const messages = await prisma.message.deleteMany();
+  return NextResponse.json(messages);
 }

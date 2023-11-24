@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import axios from "axios";
-import { Server } from "http";
+import { Server, get } from "http";
 import Pusher from "pusher-js";
+import { useRef } from "react";
 
 interface Message {
   id: number;
@@ -13,50 +14,61 @@ interface Message {
 export default function Chat() {
   const [data, setData] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
+  const ref = useRef<HTMLDivElement>(null)
+  
+  useEffect(() => {
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
+      cluster: "eu",
+    });
 
-  const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
-    cluster: "eu",
-  })
+    const channel = pusher.subscribe("messages");
+    channel.bind("inserted", (newMessage: Message) => {
+      setData((prevData) => [...prevData, newMessage]);
+      if (ref.current) {
+        ref.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
 
-  const channel = pusher.subscribe("messages");
-  channel.bind("inserted", (newMessage: Message) => {
-    setData([...data, newMessage]);
-  });
-
-  const handleSubmit = async (message: string) => {
-    try {
-      const username = localStorage.getItem('username');
-      await axios.post('/api/messages', { username, message });
-      getMessages();
-      setMessage('');
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  const getMessages = async () => {
+    const get_original_message = async () => {
       try {
         const response = await axios.get("/api/messages");
-        console.log(response);
         setData(response.data);
+        if (ref.current) {
+          ref.current.scrollIntoView({ behavior: 'smooth' });
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
-  useEffect(() => {
-    getMessages();
+    get_original_message();
 
-  }, []);
-
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [data]);
   
+
+  const handleSubmit = async (message: string) => {
+    try {
+      const username = localStorage.getItem('username');
+      await axios.post('/api/messages', { username, message });
+      setMessage('');
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
   return (
     <main className="w-screen h-screen flex">
       <div className="flex justify-center flex-col gap-[2rem]">
-        <div className="w-[40.5rem] h-[50rem]">
+        <div className="w-[40.5rem] h-[50rem] overflow-scroll">
           {data && data.map((message: Message) => {
             return (
-              <div key={message.id} className="flex justify-start items-center gap-[1rem]">
-                <div key={message.id} className="w-[4rem] h-[4rem] rounded-[50%] bg-[#C4C4C4] flex justify-center items-center">{message.username[0]}</div>
+              <div key={message.id} ref={ref} className="flex justify-start items-center gap-[1rem] mb-[1rem]">
+                <div key={message.id} title={message.username} className="w-[4rem] h-[4rem] rounded-[50%] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] text-[2.44rem] font-extrabold flex justify-center items-center">{message.username[0].toUpperCase()}</div>
                 <div className="flex flex-col justify-center items-start gap-[0.5rem]">
                   <p key={message.id} className="text-[#000000] text-[2rem]">{message.message}</p>
                 </div>
@@ -65,7 +77,7 @@ export default function Chat() {
           }
           )}
         </div>
-        <input type="text" value={message} onKeyDown={(e) => {
+        <input type="text" placeholder="Enter the message..." className="w-[40.5rem] h-[4.5rem] pl-[3.5rem] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] rounded-[6.25rem]" value={message} onKeyDown={(e) => {
           if (e.key === 'Enter') {
             handleSubmit(message);
           }
