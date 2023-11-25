@@ -75,7 +75,7 @@ export default function Chat() {
   
 
   return (
-    <main className="w-screen h-screen flex">
+    <main className="w-screen h-screen flex justify-center gap-[1.5rem]">
       <div className="flex justify-center flex-col gap-[2rem]">
         <div className="w-[40.5rem] h-[50rem] overflow-scroll">
           {data && data.map((message: Message) => {
@@ -98,8 +98,8 @@ export default function Chat() {
           }
         }} onChange={(e) => {setMessage(e.target.value)}}  />
       </div>
-      <div>
-
+      <div className="w-full h-full smallscreen flex justify-center">
+        <iframe src="https://www.twoplayergames.org/embed/basket-random" className="w-full h-auto"></iframe>
       </div>
     </main>
   )
