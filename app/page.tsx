@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [username, setUsername] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -14,6 +15,7 @@ export default function Home() {
 
   const handleSubmit = async (username: string) => {
     try {
+      setIsLoading(true);
       const response = await axios.post('/api/users', { username });
       console.log(response);
       try {
@@ -22,6 +24,7 @@ export default function Home() {
         console.error(error);
       }
       router.push('/chat')
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -29,15 +32,23 @@ export default function Home() {
 
 
   return (
+    <>
+    {isLoading && (
+      <div className='w-screen h-screen flex justify-center items-center'>
+        <div className='w-[40.5rem] h-[7.5rem] rounded-[6.25rem] text-lg flex justify-center items-center'>
+          Loading...
+        </div>
+      </div>
+    )}
     <main className='w-screen h-screen flex justify-center items-center'>
       <div className='flex flex-col justify-center items-center gap-[2.5rem]'>
-        <input className='w-[40.5rem] h-[7.5rem] rounded-[6.25rem] placeholder:text-[#A5A5A5] text-[39px] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] pl-[4rem] ' type="text" placeholder='Enter the username' value={username} onChange={(e) => {setUsername(e.target.value)}} onKeyDown={(e) => {
+        <input className='w-[40.5rem] h-[7.5rem] rounded-[6.25rem] placeholder:text-[#A5A5A5] text-base shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] pl-[4rem] ' type="text" placeholder='Enter the username' value={username} onChange={(e) => {setUsername(e.target.value)}} onKeyDown={(e) => {
           if (e.key === 'Enter') {
             handleSubmit(username);
             setUsername('');
           }
         }}/>
-        <button className='w-[26.5rem] h-[7.5rem] rounded-[6.25rem] text-[49px] shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]' onClick={() => {
+        <button className='w-[26.5rem] h-[7.5rem] rounded-[6.25rem] text-lg shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]' onClick={() => {
           handleSubmit(username)
           setUsername('');
         }}>
@@ -45,6 +56,7 @@ export default function Home() {
         </button>
       </div>
     </main>
+    </>
   )
 }
 

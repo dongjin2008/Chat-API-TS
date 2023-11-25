@@ -81,11 +81,11 @@ export default function Chat() {
           {data && data.map((message: Message) => {
             return (
               <div key={message.id} ref={ref} className="flex justify-start items-center gap-[1rem] mb-[1rem]">
-                <div key={message.id} title={message.username} className="w-[4rem] h-[4rem] rounded-[50%] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] text-[2.44rem] font-extrabold flex justify-center items-center">
+                <div key={message.id} title={message.username} className="w-[4rem] h-[4rem] rounded-[50%] bg-white shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] text-base font-extrabold flex justify-center items-center">
                  {handleProfile(message)} 
                 </div>
                 <div className="flex flex-col justify-center items-start gap-[0.5rem]">
-                  <p key={message.id} className="text-[#000000] text-[2rem]">{message.message}</p>
+                  <p key={message.id} className="text-[#000000] text-lg">{message.message}</p>
                 </div>
               </div>
             );
