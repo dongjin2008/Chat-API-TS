@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../lib/prisma";
 import { z } from "zod";
-import limiter from "../middlewares/rateLimit";
 
 const createMessageSchema = z.object({
   username: z.string().min(1),
