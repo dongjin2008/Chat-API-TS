@@ -51,6 +51,10 @@ export default function Chat() {
   
 
   const handleSubmit = async (message: string) => {
+    if (message === '') {
+      alert('Please enter the message');
+      return;
+    }
     try {
       const username = localStorage.getItem('username');
       await axios.post('/api/messages', { username, message });
