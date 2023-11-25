@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../lib/prisma";
 import { z } from "zod";
+import limiter from "../middlewares/rateLimit";
 
 const createMessageSchema = z.object({
   username: z.string().min(1),
@@ -29,18 +30,4 @@ export async function POST(request: Request) {
   });
   pusher.trigger("messages", "inserted", new_message);
   return NextResponse.json(new_message);
-}
-
-export async function PUT(request: Request) {
-  const { id, message } = await request.json();
-  const new_message = await prisma.message.update({
-    where: { id },
-    data: { message },
-  });
-  return NextResponse.json(new_message);
-}
-
-export async function DELETE(request: Request) {
-  const messages = await prisma.message.deleteMany();
-  return NextResponse.json(messages);
 }
